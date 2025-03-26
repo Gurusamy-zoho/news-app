@@ -3,7 +3,7 @@ input{
     padding: 5px;
     width: 300px;
     margin-bottom: 30px;
-    margin-left: 450px;
+    margin-left: 250px;
 }
 
 button{
@@ -15,6 +15,7 @@ button{
     height: 35px;
     border-radius: 5px;
     cursor: pointer;
+    border: none;
 }
 
 
@@ -75,4 +76,8 @@ h1 {
 
 .news-content a:hover {
     text-decoration: underline;
+}
+
+.seprateDiv{
+    border: 1px solid #ddd;
 }
