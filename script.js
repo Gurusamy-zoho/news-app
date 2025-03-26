@@ -1,51 +1,70 @@
-
 document.getElementById("btn").addEventListener("click", () => {
-    let inputVal = document.getElementById("Searchbox").value;
+    let inputVal = document.getElementById("Searchbox").value.trim();
     let newsContainer = document.getElementById("news-container");
 
-    if(inputVal==="" || inputVal===undefined){
-        alert("Enter a news topic");
-        return
+    if (inputVal === "" || inputVal === undefined) {
+        Swal.fire({
+            title: 'Error',
+            html: `Invalid Input`,
+            icon: 'error',
+            confirmButtonText: 'Ok',
+            timer: 3000,
+            position: 'center',
+            heightAuto: false,
+            showClass: {
+                popup: 'animate__animated animate__fadeInDown'
+            },
+            hideClass: {
+                popup: 'animate__animated animate__fadeOutUp'
+            }
+        });
+        return;
     }
 
-    newsContainer.innerHTML = "";
+    newsContainer.innerHTML = `<p style="font-size: 20px; text-align: center;">⏳ Loading news... Please wait.</p>`;
 
     var xhr = new XMLHttpRequest();
     xhr.open("GET", `https://newsdata.io/api/1/news?apikey=pub_679216e1139fb7c5763e30b6bba9585f8ca7e&q=${inputVal}`, true);
 
     xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4 && xhr.status === 200) {
-            var response = JSON.parse(xhr.responseText);
-            console.log(response)
-            if (response.results && response.results.length > 0) {
-                for (var i = 0; i < Math.min(10, response.results.length); i++) { 
-                    var article = response.results[i];
-                    
-                    var newsHTML = `
-                        <div class="news-article">
-                            <img src="${article.image_url || 'placeholder.jpg'}" alt="News Image">
-                            <div class="news-content">
-                                <h2>${article.title}</h2>
-                                <p>${article.description}</p>
-                                <p><strong>Date:</strong> ${article.pubDate}</p>
-                                <p><strong>Country:</strong> ${article.country ? article.country.join(", ") : 'N/A'}</p>
-                                <a href="${article.link}" target="_blank">Read More</a>
-                            </div>
-                        </div>
-                        <br><br>
-                    `;
+        if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+                var response = JSON.parse(xhr.responseText);
+                console.log(response);
+                
+                newsContainer.innerHTML = ""; 
 
-                    newsContainer.innerHTML += newsHTML;
+                if (response.results && response.results.length > 0) {
+                    for (var i = 0; i < response.results.length; i++) {
+                        var article = response.results[i];
+
+                        var newsHTML = `
+                            <div class="news-article">
+                                <img src="${article.image_url || 'https://via.placeholder.com/150'}" alt="News Image">
+                                <div class="news-content">
+                                    <h2>${article.title}</h2>
+                                    <p>${article.description || 'No description available'}</p>
+                                    <p><strong>Date:</strong> ${article.pubDate || 'N/A'}</p>
+                                    <p><strong>Country:</strong> ${article.country ? article.country.join(", ") : 'N/A'}</p>
+                                    <a href="${article.link}" target="_blank">Read More</a>
+                                </div>
+                            </div>
+                            <br><br>
+                        `;
+
+                        newsContainer.innerHTML += newsHTML;
+                    }
+                } else {
+                    newsContainer.innerHTML = `<p style="color:red;">❌ No news found for this topic.</p>`;
                 }
             } else {
-                newsContainer.innerHTML = "<p>No news found for this topic.</p>";
+                newsContainer.innerHTML = `<p style="color:red;">⚠️ Failed to fetch news. Try again later.</p>`;
             }
         }
     };
 
     xhr.send();
 });
-
 
 let inputVal = document.getElementById("Searchbox").value;
 let newsContainer = document.getElementById("news-container");
